@@ -52,7 +52,7 @@ void displayChoice(int choice)
 }
 
 //Winner 
-void determineWinner(int computer, int user, bool& playAgain)
+void determineWinner(int computer, int user, bool& playAgain, int& wins)
 {
     if (computer == user) {
         cout << " Tie. Play again to determine the winner.\n";
@@ -80,6 +80,7 @@ void determineWinner(int computer, int user, bool& playAgain)
     else if (computer == scissors && user == paper)
         cout << "Scissors cut paper!";
 
+    if (userWins) wins++;
     cout << "\n";
     playAgain = false;
 }
@@ -88,8 +89,13 @@ void determineWinner(int computer, int user, bool& playAgain)
 int main()
 {
     srand(time(0)); 
-
+    string playerName;
+    int wins = 0;
     bool playAgain;
+
+    cout << "Enter your name:";
+    cin >> playerName;
+    cin.ignore();
 
     do {
         int computer = ComputerChoice();
@@ -98,9 +104,10 @@ int main()
         cout << "Computer chose: ";
         displayChoice(computer);
 
-        determineWinner(computer, user, playAgain);
+        determineWinner(computer, user, playAgain, wins);
 
     } while (playAgain);
 
+    cout << "Game over. " << playerName << " won " << wins << " times.\n";
     return 0;
 }
