@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ using namespace std;
 const int rock = 1,
 paper = 2,
 scissors = 3;
+const string SCORES_FILE = "rps_scores.txt";
 
 //Compter Choice
 int ComputerChoice()
@@ -24,6 +26,7 @@ int ComputerChoice()
     return (rand() % 3) + 1;
 }
 
+//Choice
 int getValidChoice()
 {
     int choice;
@@ -82,32 +85,67 @@ void determineWinner(int computer, int user, bool& playAgain, int& wins)
 
     if (userWins) wins++;
     cout << "\n";
-    playAgain = false;
+   playAgain = false;
 }
 
+void saveScore(string name, int score) {
+    ofstream file(SCORES_FILE, ios::app);
+    if (file) file << name << " " << score << endl;
+}
+void showScores() {
+    ifstream file(SCORES_FILE);
+    if (!file) {
+        cout << "No scores yet.\n";
+        return;
+    }
+    cout << "Previous Scores:\n";
+    string name; int score;
+    while (file >> name >> score)
+        cout << name << ": " << score << " wins\n";
+}
+
+void deleteScores() {
+    remove(SCORES_FILE.c_str());
+    cout << "Scores cleared.\n";
+}
+
+
 //Main
-int main()
-{
-    srand(time(0)); 
-    string playerName;
-    int wins = 0;
-    bool playAgain;
+int main() {
+    srand(time(0));
 
-    cout << "Enter your name:";
-    cin >> playerName;
-    cin.ignore();
+    while (true) {
+        cout << "\n1. View scores\n2. New game\n3. Clear scores\n4. Exit\nChoose: ";
+        int choice;
+        cin >> choice;
+        cin.ignore(100, '\n');
 
-    do {
-        int computer = ComputerChoice();
-        int user = getValidChoice();
+        if (choice == 1) showScores();
+        else if (choice == 2) {
+            // Your original game code with one addition
+            string playerName;
+            int wins = 0;
+            bool playAgain;
 
-        cout << "Computer chose: ";
-        displayChoice(computer);
+            cout << "Enter your name:";
+            cin >> playerName;
+            cin.ignore();
 
-        determineWinner(computer, user, playAgain, wins);
+            do {
+                int computer = ComputerChoice();
+                int user = getValidChoice();
+                cout << "Computer chose: ";
+                displayChoice(computer);
+                determineWinner(computer, user, playAgain, wins);
+            } while (playAgain);
 
-    } while (playAgain);
+            cout << "Game over. " << playerName << " won " << wins << " times.\n";
+            saveScore(playerName, wins); // Added this line
+        }
+        else if (choice == 3) deleteScores();
+        else if (choice == 4) break;
+        else cout << "Invalid choice.\n";
+    }
 
-    cout << "Game over. " << playerName << " won " << wins << " times.\n";
     return 0;
 }
